@@ -13,6 +13,7 @@
     },
     {
       "matches": ["https://artofproblemsolving.com/wiki/index.php/*"],
+      "exclude_matches": ["https://artofproblemsolving.com/wiki/index.php/*_Problems*"],
       "js": ["/scripts/content-testpage.js"]
     }
   ],
