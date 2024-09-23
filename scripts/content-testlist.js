@@ -3,7 +3,7 @@ testList = mwBody.getElementsByTagName('tbody')[0] || mwBody.getElementsByTagNam
 potentTestNodes = testList.querySelectorAll('td, li');
 
 testNodes = Array.from(potentTestNodes)
-    .filter(testNode => testNode.getElementsByTagName('a').length);
+  .filter(testNode => testNode.getElementsByTagName('a').length);
 
 testNodes.forEach(testNode => {
   statusText = document.createElement('p');

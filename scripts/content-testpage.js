@@ -1,9 +1,9 @@
 mwBody = document.getElementsByClassName('mw-body')[0];
-problemList = mwBody.querySelectorAll('ul ul')[0] 
-    || mwBody.getElementsByTagName('ul')[0];
+problemList = mwBody.querySelector('ul ul') 
+  || mwBody.getElementsByTagName('ul')[0];
 problemNodes = Array.from(problemList.getElementsByTagName('li'));
-testNode = problemList.parentElement.parentElement.querySelectorAll(':scope > li')[0] 
-    || mwBody.getElementsByTagName('p')[1];
+testNode = problemList.parentElement.parentElement.querySelector(':scope > li') 
+  || mwBody.getElementsByTagName('p')[1];
 
 
 (() => {

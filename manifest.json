@@ -15,6 +15,10 @@
       "matches": ["https://artofproblemsolving.com/wiki/index.php/*"],
       "exclude_matches": ["https://artofproblemsolving.com/wiki/index.php/*_Problems*"],
       "js": ["/scripts/content-testpage.js"]
+    },
+    {
+      "matches": ["https://artofproblemsolving.com/wiki/index.php/*_Problems"],
+      "js": ["/scripts/content-testproblems.js"]
     }
   ],
   "permissions": ["storage"]
