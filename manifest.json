@@ -21,6 +21,12 @@
       "js": ["/scripts/content-testproblems.js"]
     }
   ],
+  "web_accessible_resources": [
+    {
+     "matches": ["https://artofproblemsolving.com/*"],
+     "resources": ["/scripts/utils.js"]
+    }
+  ],
   "permissions": ["storage"]
 }
 

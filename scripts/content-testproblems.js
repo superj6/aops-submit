@@ -1,54 +1,77 @@
-mwBody = document.getElementsByClassName('mw-body')[0];
-wikiTables = mwBody.getElementsByClassName('wikitable');
-answerKeyLink = wikiTables.length > 1 ? wikiTables[0].getElementsByTagName('a')[1] : undefined;
-problemParts = Array.from(mwBody.querySelectorAll('#toc ~ h2, #toc ~ h3, #toc ~ p')).slice(0, -2);
+const mwBody = document.getElementsByClassName('mw-body')[0];
+const wikiTables = mwBody.getElementsByClassName('wikitable');
+const answerKeyLink = wikiTables.length > 1 ? wikiTables[0].getElementsByTagName('a')[1] : undefined;
+const problemParts = Array.from(mwBody.querySelectorAll('#toc ~ h2, #toc ~ h3, #toc ~ p')).slice(0, -2);
 
-potentProblems = []
 
-problemParts.forEach(problemPart => {
-  if(problemPart.tagName !== 'P'){
-    potentProblems.push([])
-  }
-  potentProblems.at(-1).push(problemPart)
-});
+var utils;
+async function initImports(){
+  const src = chrome.runtime.getURL("/scripts/utils.js");
+  utils = await import(src);
+}
 
-problems = potentProblems.filter(problem => problem.length > 1);
+function extractProblems(){
+  let potentProblems = []
 
-problems.forEach((problem, i) => {
+  problemParts.forEach(problemPart => {
+    if(problemPart.tagName !== 'P'){
+      potentProblems.push([])
+    }
+    potentProblems.at(-1).push(problemPart)
+  });
+
+  return potentProblems.filter(problem => problem.length > 1);
+}
+
+function getDomFromUrl(url){
+  return fetch(solutionUrl)
+    .then(response => response.text())
+    .then(html => {
+      const parser = new DOMParser();
+      return parser.parseFromString(html, 'text/html');
+    });
+}
+
+async function addonToProblem(problem, idx){
   addonDiv = document.createElement('div');
   addonDiv.innerHTML = `
-  <p id="problem-status-${i}">Not submitted</p>
-  <input id="problem-input-${i}"/>
-  <button id="problem-button-${i}">Submit</button>
-`;
+    <p id="problem-status-${idx}">Not submitted</p>
+    <input id="problem-input-${idx}"/>
+    <button id="problem-button-${idx}">Submit</button>
+  `;
   
-  addonDiv.querySelector(`#problem-button-${i}`).addEventListener('click', () => {
-    submission = document.getElementById(`problem-input-${i}`).value;
+  addonDiv.querySelector(`#problem-button-${idx}`).addEventListener('click', async () => {
+    submission = document.getElementById(`problem-input-${idx}`).value;
     if(!submission) return;
 
-    solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
+    const solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
 
-    fetch(solutionUrl)
-      .then(response => response.text())
-      .then(html => {
-        parser = new DOMParser();
-        return parser.parseFromString(html, 'text/html');
-      })
-      .then(doc => {
-        latexImgs = Array.from(doc.getElementsByClassName('latex'));
-        answer = latexImgs.reduce((accum, latexImg) => {
-          //extract latex with boxed answer
-          if(latexImg.alt.includes('box')){
-            regMatch = latexImg.alt.match(/\((.*?)\)/) || latexImg.alt.match(/{(.*?)}/);
-            accum = regMatch[1];
-          }
-          return accum;
-        });
+    const solDoc = await getDomFromUrl(solutionUrl);
+    const latexImgs = Array.from(solDoc.getElementsByClassName('latex'));
+    answer = latexImgs.reduce((accum, latexImg) => {
+      //extract latex with boxed answer
+      if(latexImg.alt.includes('box')){
+        const regMatch = latexImg.alt.match(/\((.*?)\)/) || latexImg.alt.match(/{(.*?)}/);
+        accum = regMatch[1];
+      }
+      return accum;
+    });
 
-        document.getElementById(`problem-status-${i}`).textContent = 
-          submission === answer ? 'Correct submission' : 'Wrong submission';
-      });
+    document.getElementById(`problem-status-${idx}`).textContent = 
+      submission === answer ? 'Correct submission' : 'Wrong submission';
+      
   });
 
   problem[0].parentNode.insertBefore(addonDiv, problem.at(-1));
-});
+}
+
+async function main(){
+  await initImports();
+
+  utils.kek();
+
+  const problems = extractProblems();
+  problems.forEach(addonToProblem);
+}
+
+main();
