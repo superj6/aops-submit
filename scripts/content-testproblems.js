@@ -3,7 +3,6 @@ const wikiTables = mwBody.getElementsByClassName('wikitable');
 const answerKeyLink = wikiTables.length > 1 ? wikiTables[0].getElementsByTagName('a')[1] : undefined;
 const problemParts = Array.from(mwBody.querySelectorAll('#toc ~ h2, #toc ~ h3, #toc ~ p')).slice(0, -2);
 
-
 var utils;
 async function initImports(){
   const src = chrome.runtime.getURL("/scripts/utils.js");
