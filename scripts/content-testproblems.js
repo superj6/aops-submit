@@ -24,7 +24,7 @@ function extractProblems(){
 }
 
 function getDomFromUrl(url){
-  return fetch(solutionUrl)
+  return fetch(url)
     .then(response => response.text())
     .then(html => {
       const parser = new DOMParser();
@@ -32,7 +32,7 @@ function getDomFromUrl(url){
     });
 }
 
-async function addonToProblem(problem, idx){
+function addonToProblem(problem, idx){
   addonDiv = document.createElement('div');
   addonDiv.innerHTML = `
     <p id="problem-status-${idx}">Not submitted</p>
@@ -67,8 +67,6 @@ async function addonToProblem(problem, idx){
 
 async function main(){
   await initImports();
-
-  utils.kek();
 
   const problems = extractProblems();
   problems.forEach(addonToProblem);
