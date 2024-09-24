@@ -2,4 +2,4 @@
 
 A chrome extension to submit and grade solutions to tests on aops.com and track practice.
 
-<img src="https://jgon.net/images/aops-submit.png" height="500px">
+<img src="https://jgon.net/static/images/aops-submit.png" height="500px">
