@@ -28,6 +28,8 @@ function extractProblems(){
 
 function addonToProblem(problem, idx){
   addonDiv = document.createElement('div');
+  addonDiv.style.border = '1px solid black';
+  addonDiv.style.padding = '5px';
   addonDiv.innerHTML = `
     <p id="problem-status-${idx}">${utils.statusTypes.problem[testStatus[idx]]}</p>
     <input id="problem-input-${idx}"/>
