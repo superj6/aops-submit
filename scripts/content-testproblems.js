@@ -22,15 +22,6 @@ function extractProblems(){
   return potentProblems.filter(problem => problem.length > 1);
 }
 
-function getDomFromUrl(url){
-  return fetch(url)
-    .then(response => response.text())
-    .then(html => {
-      const parser = new DOMParser();
-      return parser.parseFromString(html, 'text/html');
-    });
-}
-
 function addonToProblem(problem, idx){
   addonDiv = document.createElement('div');
   addonDiv.innerHTML = `
@@ -45,7 +36,7 @@ function addonToProblem(problem, idx){
 
     const solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
 
-    const solDoc = await getDomFromUrl(solutionUrl);
+    const solDoc = await utils.getDomFromUrl(solutionUrl);
     const latexImgs = Array.from(solDoc.getElementsByClassName('latex'));
     answer = latexImgs.reduce((accum, latexImg) => {
       //extract latex with boxed answer
