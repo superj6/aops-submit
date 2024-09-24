@@ -20,6 +20,15 @@ const statusTypes = {
   ]
 }
 
+function parseSubmissionValue(val){
+  //differentiate between multiple choice and numeric values
+  if(isNaN(val)){
+    return val;
+  }else{
+    return Number(val);
+  }
+}
+
 function getTestStatus(testUrl){
   return chrome.storage.local.get(testUrl).then(obj => obj[testUrl]);
 }
@@ -36,7 +45,6 @@ function initTestStatus(testUrl, problems){
 
 function updateProblemStatus(testUrl, problemIdx, submissionStatus){
   return getTestStatus(testUrl).then(testStatus => {
-    console.log(testStatus);
     testStatus[problemIdx] = Math.max(testStatus[problemIdx], submissionStatus);
     return setTestStatus(testUrl, testStatus);
   });
@@ -44,6 +52,7 @@ function updateProblemStatus(testUrl, problemIdx, submissionStatus){
 
 export {
   getDomFromUrl,
+  parseSubmissionValue,
   statusTypes,
   getTestStatus,
   setTestStatus,

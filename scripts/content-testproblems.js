@@ -39,6 +39,7 @@ function addonToProblem(problem, idx){
   
   addonDiv.querySelector(`#problem-button-${idx}`).addEventListener('click', async () => {
     submissionVal = document.getElementById(`problem-input-${idx}`).value;
+    submissionVal = utils.parseSubmissionValue(submissionVal);
     if(!submissionVal) return;
 
     const solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
@@ -53,6 +54,8 @@ function addonToProblem(problem, idx){
       }
       return accum;
     });
+
+    answerVal = utils.parseSubmissionValue(answerVal);
 
     const submissionStatus = submissionVal === answerVal ? 2 : 1;
     testStatus = await utils.updateProblemStatus(testUrl, idx, submissionStatus);
