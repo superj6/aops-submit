@@ -3,6 +3,9 @@
   "name": "AOPS Submit",
   "description": "Submit solutions and track progress on aops.com tests.",
   "version": "1.0",
+  "icons": {
+    "128": "/icons/main-icon.png"
+  },
   "action": {
     "default_popup": "/views/index.html"
   },
