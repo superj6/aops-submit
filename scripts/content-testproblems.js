@@ -44,15 +44,19 @@ function extractProblems(){
 }
 
 function addonToProblem(problem, idx){
+  inputNode = answerKeyLink ? 'input' : 'textarea';
+
   addonDiv = document.createElement('div');
   addonDiv.style.border = '1px solid black';
   addonDiv.style.padding = '5px';
   addonDiv.innerHTML = `
     <p id="problem-status-${idx}">${utils.statusTypes.problem[testStatus[idx]]}</p>
-    <input id="problem-input-${idx}"/>
+    <${inputNode} id="problem-input-${idx}i"></${inputNode}>
     <button id="problem-button-${idx}">Submit</button>
     <p id="problem-submission-${idx}"></p>
   `;
+
+  console.log(addonDiv);
   
   addonDiv.querySelector(`#problem-button-${idx}`).addEventListener('click', async () => {
     submissionVal = document.getElementById(`problem-input-${idx}`).value;

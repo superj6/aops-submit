@@ -7,6 +7,14 @@ function getDomFromUrl(url){
     });
 }
 
+function getApiKey(){
+  return chrome.storage.local.get('apiKey').then(obj => obj.apiKey);
+}
+
+function setApiKey(apiKey){
+  chrome.storage.local.set({'apiKey': apiKey});
+}
+
 const statusTypes = {
   problem: [
     'No attempt',
@@ -63,6 +71,8 @@ function updateProblemStatus(testUrl, problemIdx, submissionStatus){
 
 export {
   getDomFromUrl,
+  getApiKey,
+  setApiKey,
   parseSubmissionValue,
   statusTypes,
   testStatusToSummaryString,

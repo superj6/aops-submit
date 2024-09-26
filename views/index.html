@@ -7,5 +7,16 @@
 <body>
   <h1>AOPS Submit</h1>
   <p>Submit and store progress to problems on the <a target="_blank" rel="noopener noreferrer" href="https://artofproblemsolving.com">artofproblemsolving</a> website.</p>
+  <section>
+    <h2>API Settings</h2>
+    <p>The OpenAI API is used to grade proof-based problems.</p>
+    <label for="api-input">
+      Api Key:
+      <input id="api-input" type="text" placeholder="..." />
+    </label>
+    <button id="api-button">Update</button>
+    <p>Don't have one? Sign up and create one <a target="_blank" rel="noopener noreferrer" href="https://platform.openai.com/api-keys">here</a>.</p>
+  </section>
+  <script src="/scripts/index.js" type="module"></script>
 </body>
 </html>
