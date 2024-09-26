@@ -1,9 +1,10 @@
 const mwBody = document.getElementsByClassName('mw-body')[0];
 const problemList = mwBody.querySelector('ul ul') 
   || mwBody.getElementsByTagName('ul')[0];
-const problemNodes = Array.from(problemList.getElementsByTagName('li'));
 const testNode = problemList.parentElement.parentElement.querySelector(':scope > li') 
-  || mwBody.getElementsByTagName('p')[1];
+  || mwBody.getElementsByTagName('a')[0].parentElement;
+const problemNodes = Array.from(problemList.getElementsByTagName('li'))
+  .slice(testNode.tagName == 'LI' && testNode.parentElement.children.length > 2 ? 2 : 0);
 const testUrl = testNode.getElementsByTagName('a')[0].href;
 
 var utils;
