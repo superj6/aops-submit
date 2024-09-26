@@ -19,13 +19,7 @@ async function displayTestStatus(testNode){
   const testStatus = await utils.getTestStatus(testUrl);
 
   statusText = document.createElement('p');
-  if(testStatus){
-    let total = testStatus.length;
-    let correct = testStatus.filter(status => status === 2).length;
-    statusText.textContent = `${correct}/${total} complete`;
-  }else{
-    statusText.textContent = 'Not started';
-  }
+  statusText.textContent = utils.testStatusToSummaryString(testStatus);
 
   testNode.appendChild(statusText);
 }

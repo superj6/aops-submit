@@ -29,6 +29,17 @@ function parseSubmissionValue(val){
   }
 }
 
+function testStatusToSummaryString(testStatus){
+  if(!testStatus) return 'Not started';
+  let total = testStatus.length;
+
+  let attempted = testStatus.filter(probStatus => probStatus > 0).length;
+  if(!attempted) return 'Not started';
+
+  let correct = testStatus.filter(probStatus => probStatus === 2).length;
+  return `${correct}/${total} complete`;
+}
+
 function getTestStatus(testUrl){
   return chrome.storage.local.get(testUrl).then(obj => obj[testUrl]);
 }
@@ -54,6 +65,7 @@ export {
   getDomFromUrl,
   parseSubmissionValue,
   statusTypes,
+  testStatusToSummaryString,
   getTestStatus,
   setTestStatus,
   initTestStatus,
