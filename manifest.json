@@ -12,6 +12,7 @@
   "content_scripts": [
     {
       "matches": ["https://artofproblemsolving.com/wiki/index.php/*_Problems_and_Solutions"],
+      "exclude_matches": ["https://artofproblemsolving.com/wiki/index.php/AMC_Problems_and_Solutions"],
       "js": ["/scripts/content-testlist.js"]
     },
     {

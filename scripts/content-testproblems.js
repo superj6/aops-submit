@@ -72,8 +72,8 @@ function addonToProblem(problem, idx){
       return accum;
     });
 
-    const submissionStatus = (answerKey ? answerKey[idx] === submissionVal : false) 
-      || submissionVal === answerVal ? 2 : 1;
+    const submissionStatus = ((answerKey ? answerKey[idx] === submissionVal : false) 
+      || submissionVal === answerVal) ? 2 : 1;
     testStatus = await utils.updateProblemStatus(testUrl, idx, submissionStatus);
     
     document.getElementById(`problem-status-${idx}`).textContent = utils.statusTypes.problem[testStatus[idx]];

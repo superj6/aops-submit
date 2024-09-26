@@ -4,7 +4,7 @@ const problemList = mwBody.querySelector('ul ul')
 const testNode = problemList.parentElement.parentElement.querySelector(':scope > li') 
   || mwBody.getElementsByTagName('a')[0].parentElement;
 const problemNodes = Array.from(problemList.getElementsByTagName('li'))
-  .slice(testNode.tagName == 'LI' && testNode.parentElement.children.length > 2 ? 2 : 0);
+  .slice(testNode.tagName == 'LI' && testNode.parentElement == problemList ? 2 : 0);
 const testUrl = testNode.getElementsByTagName('a')[0].href;
 
 var utils;
@@ -19,7 +19,7 @@ function displayTestStatus(){
   statusText = document.createElement('p');
   statusText.textContent = utils.testStatusToSummaryString(testStatus);
 
-  testNode.appendChild(statusText);
+  testNode.insertBefore(statusText, testNode.getElementsByTagName('a')[0].nextSibling);
 }
 
 function displayProblemStatus(problemNode, idx){
