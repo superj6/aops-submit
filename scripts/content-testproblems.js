@@ -94,9 +94,15 @@ You are given the following submission proof: """${submissionVal}""".
 
 Grade the submission on a scale of 0-7. On the first line only output the number grade. On the following lines give a brief explanation. The submission does not need to be exactly the same as the solution for full points, but it should use some similar ideas, follow a reasonable sequence of logic, and reach the same conclusion. No deductions for being brief as long as the steps are correct, small deductions for minor logic errors, full points deducted for entirely wrong approach. Grade leniently if the conclusion is the same, harshly otherwise.`;
 
-  const gradingFeedback = await utils.getPromptCompletion(gradingPrompt);
-  const gradeVal = utils.parseSubmissionValue(gradingFeedback.split('\n')[0]);
-  
+  let gradingFeedback;
+  try{
+    gradingFeedback = await utils.getPromptCompletion(gradingPrompt);
+  }catch(err){
+    document.getElementById(`problem-submission-${idx}`).textContent = 'Grading error - likely need to update OpenAI API key';
+    return;
+  }
+
+  const gradeVal = utils.parseSubmissionValue(gradingFeedback.split('\n')[0]);  
   const submissionStatus = gradeVal >= 6 ? 2 : 1;
   testStatus = await utils.updateProblemStatus(testUrl, idx, submissionStatus);
 
