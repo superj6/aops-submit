@@ -31,7 +31,7 @@ async function getAnswerKey(){
 }
 
 function extractProblems(){
-  let potentProblems = []
+  let potentProblems = [];
 
   problemParts.forEach(problemPart => {
     if(problemPart.tagName !== 'P'){
@@ -43,6 +43,72 @@ function extractProblems(){
   problems = potentProblems.filter(problem => problem.length > 1);
 }
 
+async function processAnswerProblem(idx){
+  problem = problems[idx];
+
+  const submissionVal = utils.parseSubmissionValue(document.getElementById(`problem-input-${idx}`).value);
+  if(!submissionVal) return;
+
+  const solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
+
+  const solDoc = await utils.getDomFromUrl(solutionUrl);
+  const latexImgs = Array.from(solDoc.getElementsByClassName('latex'));
+  answerVal = latexImgs.reduce((accum, latexImg) => {
+    //extract latex with boxed answer
+    if(latexImg.alt.includes('box')){
+      const regMatch = latexImg.alt.match(/\((.*?)\)/) || latexImg.alt.match(/{(.*?)}/);
+      accum = utils.parseSubmissionValue(regMatch[1]);
+    }
+    return accum;
+  });
+
+  const submissionStatus = ((answerKey ? answerKey[idx] === submissionVal : false) 
+    || submissionVal === answerVal) ? 2 : 1;
+  testStatus = await utils.updateProblemStatus(testUrl, idx, submissionStatus);
+  
+  document.getElementById(`problem-status-${idx}`).textContent = utils.statusTypes.problem[testStatus[idx]];
+  document.getElementById(`problem-submission-${idx}`).textContent = utils.statusTypes.submission[submissionStatus];
+}
+
+async function processProofProblem(idx){
+  problem = problems[idx];
+
+  const submissionVal = document.getElementById(`problem-input-${idx}`).value;
+  if(!submissionVal) return;
+
+  const problemVal = utils.latexDomToString(problem.slice(1, -1));
+
+  const solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
+  const solDoc = await utils.getDomFromUrl(solutionUrl);
+  const solMwBody = solDoc.getElementsByClassName('mw-parser-output')[0];
+  const solParts = Array.from(solMwBody.querySelectorAll(':scope > h2, :scope > p'));
+  const solPartTags = solParts.map(part => part.tagName);
+  const solStartIdx = solPartTags.indexOf('H2') + 1;
+  const solEndIdx = solPartTags.indexOf('H2', solStartIdx);
+  const answerVal = utils.latexDomToString(solParts.slice(solStartIdx, solEndIdx));
+
+  const gradingPrompt = `Problem: """${problemVal}""".
+Solution proof: """${answerVal}""".
+
+You are given the following submission proof: """${submissionVal}""".
+
+Grade the submission on a scale of 0-7. On the first line only output the number grade. On the following lines give a brief explanation. The submission does not need to be exactly the same as the solution for full points, but it should use some similar ideas, follow a reasonable sequence of logic, and reach the same conclusion. No deductions for being brief as long as the steps are correct, small deductions for minor logic errors, full points deducted for entirely wrong approach. Grade leniently if the conclusion is the same, harshly otherwise.`;
+
+  const gradingFeedback = await utils.getPromptCompletion(gradingPrompt);
+  const gradeVal = utils.parseSubmissionValue(gradingFeedback.split('\n')[0]);
+  
+  const submissionStatus = gradeVal >= 6 ? 2 : 1;
+  testStatus = await utils.updateProblemStatus(testUrl, idx, submissionStatus);
+
+  document.getElementById(`problem-status-${idx}`).textContent = utils.statusTypes.problem[testStatus[idx]];
+  document.getElementById(`problem-submission-${idx}`).innerHTML = `
+${utils.statusTypes.submission[submissionStatus]}
+<details>
+    <summary style="display: list-item">Explanation</summary>
+    ${gradingFeedback}
+</details>`;
+}
+
 function addonToProblem(problem, idx){
   inputNode = answerKeyLink ? 'input' : 'textarea';
 
@@ -51,38 +117,13 @@ function addonToProblem(problem, idx){
   addonDiv.style.padding = '5px';
   addonDiv.innerHTML = `
     <p id="problem-status-${idx}">${utils.statusTypes.problem[testStatus[idx]]}</p>
-    <${inputNode} id="problem-input-${idx}i"></${inputNode}>
+    <${inputNode} id="problem-input-${idx}"></${inputNode}>
     <button id="problem-button-${idx}">Submit</button>
     <p id="problem-submission-${idx}"></p>
   `;
-
-  console.log(addonDiv);
-  
-  addonDiv.querySelector(`#problem-button-${idx}`).addEventListener('click', async () => {
-    submissionVal = document.getElementById(`problem-input-${idx}`).value;
-    submissionVal = utils.parseSubmissionValue(submissionVal);
-    if(!submissionVal) return;
-
-    const solutionUrl = problem.at(-1).getElementsByTagName('a')[0].href;
-
-    const solDoc = await utils.getDomFromUrl(solutionUrl);
-    const latexImgs = Array.from(solDoc.getElementsByClassName('latex'));
-    answerVal = latexImgs.reduce((accum, latexImg) => {
-      //extract latex with boxed answer
-      if(latexImg.alt.includes('box')){
-        const regMatch = latexImg.alt.match(/\((.*?)\)/) || latexImg.alt.match(/{(.*?)}/);
-        accum = utils.parseSubmissionValue(regMatch[1]);
-      }
-      return accum;
-    });
-
-    const submissionStatus = ((answerKey ? answerKey[idx] === submissionVal : false) 
-      || submissionVal === answerVal) ? 2 : 1;
-    testStatus = await utils.updateProblemStatus(testUrl, idx, submissionStatus);
-    
-    document.getElementById(`problem-status-${idx}`).textContent = utils.statusTypes.problem[testStatus[idx]];
-    document.getElementById(`problem-submission-${idx}`).textContent = utils.statusTypes.submission[submissionStatus];
-  });
+ 
+  addonDiv.querySelector(`#problem-button-${idx}`).addEventListener('click', 
+    () => answerKeyLink ? processAnswerProblem(idx) : processProofProblem(idx));
 
   problem[0].parentNode.insertBefore(addonDiv, problem.at(-1));
 }

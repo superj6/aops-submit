@@ -7,12 +7,40 @@ function getDomFromUrl(url){
     });
 }
 
+function latexDomToString(pArray){
+  return pArray
+    .map(pNode => 
+      Array.from(pNode.childNodes).reduce((accum, node) => 
+        accum + (node.tagName == 'IMG' ? node.alt : node.textContent), '')
+    )
+    .join('\n'); 
+}
+
 function getApiKey(){
   return chrome.storage.local.get('apiKey').then(obj => obj.apiKey);
 }
 
 function setApiKey(apiKey){
   chrome.storage.local.set({'apiKey': apiKey});
+}
+
+function getPromptCompletion(query){
+  return getApiKey()
+    .then(apiKey => 
+      fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{role: 'user', content: query}]
+        })
+      })
+    )
+    .then(response => response.json())
+    .then(response => response.choices[0].message.content);
 }
 
 const statusTypes = {
@@ -30,11 +58,11 @@ const statusTypes = {
 
 function parseSubmissionValue(val){
   //differentiate between multiple choice and numeric values
-  if(isNaN(val)){
-    return val;
-  }else{
-    return Number(val);
+  const intMatch = val.match(/\d+/);
+  if(intMatch){
+    return parseInt(intMatch[0]);
   }
+  return val;
 }
 
 function testStatusToSummaryString(testStatus){
@@ -71,8 +99,10 @@ function updateProblemStatus(testUrl, problemIdx, submissionStatus){
 
 export {
   getDomFromUrl,
+  latexDomToString,
   getApiKey,
   setApiKey,
+  getPromptCompletion,
   parseSubmissionValue,
   statusTypes,
   testStatusToSummaryString,
