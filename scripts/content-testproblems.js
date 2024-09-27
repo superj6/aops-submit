@@ -92,7 +92,7 @@ Solution proof: """${answerVal}""".
 
 You are given the following submission proof: """${submissionVal}""".
 
-Grade the submission on a scale of 0-7. On the first line only output the number grade. On the following lines give a brief explanation. The submission does not need to be exactly the same as the solution for full points, but it should use some similar ideas, follow a reasonable sequence of logic, and reach the same conclusion. No deductions for being brief as long as the steps are correct, small deductions for minor logic errors, full points deducted for entirely wrong approach. Grade leniently if the conclusion is the same, harshly otherwise.`;
+Grade the submission on a scale of 0-7. On the first line only output the number grade. On the following lines give a brief explanation. The submission does not need to be exactly the same as the solution for full points, but it should use some similar ideas, follow a reasonable sequence of logic, and reach the same conclusion. No deductions for being too brief or too complex as long as the steps are correct, small deductions for minor logic errors, full points deducted for entirely wrong approach. Grade leniently if the conclusion is the same, harshly otherwise.`;
 
   let gradingFeedback;
   try{
