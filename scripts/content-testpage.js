@@ -4,7 +4,7 @@ const problemList = mwBody.querySelector('ul ul')
 const testNode = problemList.parentElement.parentElement.querySelector(':scope > li') 
   || mwBody.getElementsByTagName('a')[0].parentElement;
 const problemNodes = Array.from(problemList.getElementsByTagName('li'))
-  .slice(testNode.tagName == 'LI' && testNode.parentElement == problemList ? 2 : 0);
+  .slice(testNode.tagName == 'LI' && testNode.parentElement == problemList ? (testNode.nextElementSibling.textContent.match(/[aA]nswer/) ? 2 : 1) : 0);
 const testUrl = testNode.getElementsByTagName('a')[0].href;
 
 var utils;
