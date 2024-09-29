@@ -3,7 +3,7 @@ const testUrl = window.location.href;
 const mwBody = document.getElementsByClassName('mw-body')[0];
 const wikiTables = mwBody.getElementsByClassName('wikitable');
 const answerKeyLink = wikiTables.length > 1 ? wikiTables[0].getElementsByTagName('a')[1] : undefined;
-const problemParts = Array.from(mwBody.querySelectorAll('#toc ~ h2, #toc ~ h3, #toc ~ p')).slice(0, -2);
+const problemParts = Array.from(mwBody.querySelectorAll('#toc ~ h2, #toc ~ h3, #toc ~ p'));
 
 var utils;
 var testStatus;
@@ -33,14 +33,16 @@ async function getAnswerKey(){
 function extractProblems(){
   let potentProblems = [];
 
-  problemParts.forEach(problemPart => {
+  const problemPartSols = problemParts.map(part => part.textContent.match(/[sS]olution/) ? true : false);
+
+  problemParts.slice(0, problemPartSols.lastIndexOf(true) + 1).forEach(problemPart => {
     if(problemPart.tagName !== 'P'){
       potentProblems.push([])
     }
     potentProblems.at(-1).push(problemPart);
   });
 
-  problems = potentProblems.filter(problem => problem.length > 1);
+  problems = potentProblems.filter(problem => problem[0].textContent.match(/[pP]roblem/));
 }
 
 async function processAnswerProblem(idx){
@@ -82,9 +84,9 @@ async function processProofProblem(idx){
   const solDoc = await utils.getDomFromUrl(solutionUrl);
   const solMwBody = solDoc.getElementsByClassName('mw-parser-output')[0];
   const solParts = Array.from(solMwBody.querySelectorAll(':scope > h2, :scope > p'));
-  const solPartTags = solParts.map(part => part.tagName);
-  const solStartIdx = solPartTags.indexOf('H2') + 1;
-  const solEndIdx = solPartTags.indexOf('H2', solStartIdx);
+  const solPartTags = solParts.map(part => part.tagName.match(/H\d/) && part.textContent.match(/[sS]olution/) && !part.textContent.match(/[vV]ideo/) ? true : false);
+  const solStartIdx = solPartTags.indexOf(true) + 1;
+  const solEndIdx = solPartTags.indexOf(true, solStartIdx) != -1 ? solPartTags.indexOf(true, solStartIdx) : solPartTags.length;
   const answerVal = utils.latexDomToString(solParts.slice(solStartIdx, solEndIdx));
 
   const gradingPrompt = `Problem: """${problemVal}""".

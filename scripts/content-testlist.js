@@ -26,7 +26,7 @@ async function displayTestStatus(testNode){
 
 async function main(){
   await initImports();
-
+  
   const testNodes = getTestNodes();
   testNodes.forEach(displayTestStatus);
 }

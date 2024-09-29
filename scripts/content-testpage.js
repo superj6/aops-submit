@@ -2,10 +2,13 @@ const mwBody = document.getElementsByClassName('mw-body')[0];
 const problemList = mwBody.querySelector('ul ul') 
   || mwBody.getElementsByTagName('ul')[0];
 const testNode = problemList.parentElement.parentElement.querySelector(':scope > li') 
-  || mwBody.getElementsByTagName('a')[0].parentElement;
+  || (problemList.previousElementSibling != mwBody.getElementsByTagName('p')[0] 
+  ? mwBody.getElementsByTagName('a')[0].parentElement 
+  : problemList.getElementsByTagName('li')[0]);
 const problemNodes = Array.from(problemList.getElementsByTagName('li'))
   .slice(testNode.tagName == 'LI' && testNode.parentElement == problemList ? (testNode.nextElementSibling.textContent.match(/[aA]nswer/) ? 2 : 1) : 0);
 const testUrl = testNode.getElementsByTagName('a')[0].href;
+
 
 var utils;
 var testStatus;
@@ -24,11 +27,7 @@ function displayTestStatus(){
 
 function displayProblemStatus(problemNode, idx){
   statusText = document.createElement('p');
-  if(testStatus){
-    statusText.textContent = utils.statusTypes.problem[testStatus[idx]];
-  }else{
-    statusText.textContent = 'Not started';    
-  }
+  statusText.textContent = utils.statusTypes.problem[testStatus ? testStatus[idx] : 0];
 
   problemNode.appendChild(statusText);
 }
